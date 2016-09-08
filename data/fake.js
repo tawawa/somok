@@ -4,7 +4,7 @@ module.exports.generate = function(max){
 	var profiles = [],
 		users 	 = [];
 
-	for(var i=0;i<max;i++){
+	for(var i=0;i<max;i++) {
 		var fname = faker.name.firstName();
 		var lname = faker.name.lastName();
 
