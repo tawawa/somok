@@ -1,3 +1,4 @@
+'use strict';
 var redis = require('redis'),
 	options = require('./options');
 
@@ -68,9 +69,17 @@ function Grants(){
 		hmset(userKey(grantKey), userHash).
 		hmset(clientKey(grantKey),clientHash);
 
+		// auto-expire grants after 30 seconds
+		const ttl = parseInt(process.env.GrantTTL || 30);
+		batch.expire(grantKey, ttl);
+		batch.expire(userKey(grantKey), ttl);
+		batch.expire(clientKey(grantKey), ttl);
+
 		if (grant.token){
 			batch.hset(grantKey, 'token',grant.token);
 			batch.set(key(grant.token), grantKey); // store foreign key...
+
+			batch.expire(key(grant.token), ttl);
 		}
 		batch
 		.exec(function(err, replies){
