@@ -6,8 +6,10 @@ var app = require('express')(),
 	data = require('./data'),
 	auth = require('./auth'),
 	bodyParser = require('body-parser'),
+	morgan = require('morgan'),
 	debug = require('debug')('somok');
 
+app.use(morgan('short'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
