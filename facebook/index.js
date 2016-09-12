@@ -14,5 +14,6 @@ router.post('/oauth/access_token', lib.token);
 
 router.get('/v2.0/me', profile.serve);
 router.get('/v2.5/me', profile.serve);
+router.get('/v2.6/me', profile.serve);
 
 module.exports = router;
