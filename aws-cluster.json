@@ -1,0 +1,272 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Somok cluster",
+  "Parameters": {
+    "KeyPair": {
+      "Description": "A SSH key pair",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "RedisEndpoint": {
+      "Description": "Redis endpoint",
+      "Type": "String",
+      "MinLength": "9"
+    },
+    "RedisAccessKey": {
+      "Description": "Redis Primary Access Key",
+      "Type": "String",
+      "MinLength": "9"
+    }
+  },
+  "Mappings": {
+    "AMI": {
+      "us-east-1": {
+        "ubuntu": "ami-fce3c696"
+      },
+      "eu-west-1": {
+        "ubuntu": "ami-f95ef58a"
+      }
+    }
+  },
+  "Resources": {
+    "VPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": { "Ref": "AWS::StackId" }
+          }
+        ]
+      }
+    },
+    "Subnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": "10.0.0.0/24",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": { "Ref": "AWS::StackId" }
+          }
+        ]
+      }
+    },
+    "InternetGateway": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties":{
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": { "Ref": "AWS::StackId" }
+          }
+        ]
+      }
+    },
+    "VPCGatewayAttachment": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "InternetGatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "RouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": { "Ref": "AWS::StackId" }
+          }
+        ]
+      }
+    },
+    "Route": {
+      "Type": "AWS::EC2::Route",
+      "DependsOn": "VPCGatewayAttachment",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "RouteTable"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "RouteTableAssoication": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "Subnet"
+        },
+        "RouteTableId": {
+          "Ref": "RouteTable"
+        }
+      }
+    },
+
+    "Mock1": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-1c4a046f",
+        "InstanceType": "t2.small",
+        "NetworkInterfaces": [
+          {
+            "AssociatePublicIpAddress": "true",
+            "DeviceIndex": "0",
+            "GroupSet": [
+              {
+                "Ref": "SSH"
+              }
+            ],
+            "SubnetId": {
+              "Ref": "Subnet"
+            }
+          }
+        ],
+        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+             "#!/bin/bash -xe\n",
+             "apt-get update\n",
+             "curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -\n",
+             "sudo apt-get -y install nginx python-software-properties python-setuptools git nodejs\n",
+             "git clone https://github.com/zamd/somok.git\n",
+             "cd somok && cp ./somok.conf /etc/init/somok.conf && sudo npm install && cd ..\n",
+             "cd somok && echo REDIS_HOST=\"", {"Ref": "RedisEndpoint"} , "\" >> .env && cd ..\n",
+             "cd somok && echo REDIS_AUTH_KEY=\"", {"Ref": "RedisAccessKey"} , "\" >> .env && cd ..\n",
+             "cd somok/setup && sudo /bin/bash ./setup.sh\n",
+             "sudo service somok start\n",
+             "mkdir aws-cfn-bootstrap-latest\n",
+             "curl https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz | tar xz -C aws-cfn-bootstrap-latest --strip-components 1\n",
+             "easy_install aws-cfn-bootstrap-latest\n",
+             "/usr/local/bin/cfn-signal -e $? ",
+             "         --stack ", { "Ref" : "AWS::StackName" },
+             "         --resource Mock1 ",
+             "         --region ", { "Ref" : "AWS::Region" }, "\n"
+        ]]}},
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": { "Ref": "AWS::StackId" }
+          },
+          {
+            "Key": "Name",
+            "Value": "mock-instance-1"
+          }
+        ],
+        "KeyName": {
+          "Ref": "KeyPair"
+        }
+      }
+    },
+    "Mock2": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-1c4a046f",
+        "InstanceType": "t2.small",
+        "NetworkInterfaces": [
+          {
+            "AssociatePublicIpAddress": "true",
+            "DeviceIndex": "0",
+            "GroupSet": [
+              {
+                "Ref": "SSH"
+              }
+            ],
+            "SubnetId": {
+              "Ref": "Subnet"
+            }
+          }
+        ],
+        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+             "#!/bin/bash -xe\n",
+             "apt-get update\n",
+             "curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -\n",
+             "sudo apt-get -y install nginx python-software-properties python-setuptools git nodejs\n",
+             "git clone https://github.com/zamd/somok.git\n",
+             "cd somok && cp ./somok.conf /etc/init/somok.conf && sudo npm install && cd ..\n",
+             "cd somok && echo REDIS_HOST=\"", {"Ref": "RedisEndpoint"} , "\" >> .env && cd ..\n",
+             "cd somok && echo REDIS_AUTH_KEY=\"", {"Ref": "RedisAccessKey"} , "\" >> .env && cd ..\n",
+             "cd somok/setup && sudo /bin/bash ./setup.sh\n",
+             "sudo service somok start\n",
+             "mkdir aws-cfn-bootstrap-latest\n",
+             "curl https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz | tar xz -C aws-cfn-bootstrap-latest --strip-components 1\n",
+             "easy_install aws-cfn-bootstrap-latest\n",
+             "/usr/local/bin/cfn-signal -e $? ",
+             "         --stack ", { "Ref" : "AWS::StackName" },
+             "         --resource Mock2 ",
+             "         --region ", { "Ref" : "AWS::Region" }, "\n"
+        ]]}},
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": { "Ref": "AWS::StackId" }
+          },
+          {
+            "Key": "Name",
+            "Value": "mock-instance-2"
+          }
+        ],
+        "KeyName": {
+          "Ref": "KeyPair"
+        }
+      }
+    },
+    "ElasticLoadBalancer" : {
+      "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties" : {
+      "Subnets": [{ "Ref": "Subnet" }],
+      "SecurityGroups": [{ "Ref": "SSH" }],
+        "Instances": [
+          { "Ref": "Mock1" },
+          { "Ref": "Mock2" }
+        ],
+        "CrossZone" : "true",
+        "Listeners" : [ {
+          "LoadBalancerPort" : "443",
+          "InstancePort" : "443",
+          "Protocol" : "TCP"
+        } ]
+      }
+    },
+    "SSH": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "ssh acccess from everywhere",
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": 22,
+            "IpProtocol": "tcp",
+            "ToPort": 22
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "443",
+            "IpProtocol": "tcp",
+            "ToPort": "443"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs" : {
+    "MockURL" : {
+      "Description" : "URL of mock facebook",
+      "Value" :  { "Fn::Join" : [ "", [ "https://", { "Fn::GetAtt" : [ "ElasticLoadBalancer", "DNSName" ]}]]}
+    }
+  }
+}
