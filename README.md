@@ -5,7 +5,7 @@ It's a basic OAuth2 authorization server built on top of oauth2rize framework an
 
 ## AWS
 ### Ireland
-[![](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=somok-cluster&templateURL=https://s3.us-east-2.amazonaws.com/nacho-dev/somok-aws-template.json)
+[![](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=somok-cluster&templateURL=https://s3-eu-west-1.amazonaws.com/zulfiqar-dev/aws-cluster.json)
 
 ### Ohio (us-east-2)
 [![](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?stackName=somok-cluster&templateURL=https://s3.us-east-2.amazonaws.com/nacho-dev/somok-aws-template.json)
