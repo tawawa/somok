@@ -20,11 +20,24 @@
   "Mappings": {
     "AMI": {
       "us-east-1": {
-        "ubuntu": "ami-fce3c696"
+        "ubuntu": "ami-c8580bdf"
+      },
+      "us-east-2": {
+        "ubuntu": "ami-b7075dd2"
+      },
+      "us-west-1": {
+        "ubuntu": "ami-61074c01"
+      },
+      "us-west-2": {
+        "ubuntu": "ami-01f05461"
       },
       "eu-west-1": {
         "ubuntu": "ami-f95ef58a"
+      },
+      "eu-central-1": {
+        "ubuntu": "ami-9c09f0f3"
       }
+
     }
   },
   "Resources": {
@@ -119,7 +132,7 @@
     "Mock1": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
-        "ImageId": "ami-1c4a046f",
+        "ImageId" : { "Fn::FindInMap" : [ "AMI", { "Ref" : "AWS::Region" }, "ubuntu"]},
         "InstanceType": "t2.small",
         "NetworkInterfaces": [
           {
@@ -172,7 +185,7 @@
     "Mock2": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
-        "ImageId": "ami-1c4a046f",
+        "ImageId" : { "Fn::FindInMap" : [ "AMI", { "Ref" : "AWS::Region" }, "ubuntu"]},
         "InstanceType": "t2.small",
         "NetworkInterfaces": [
           {
