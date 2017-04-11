@@ -7,10 +7,14 @@ It's a basic OAuth2 authorization server built on top of oauth2rize framework an
 ### Ireland
 [![](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=somok-cluster&templateURL=https://s3-eu-west-1.amazonaws.com/zulfiqar-dev/aws-cluster.json)
 
+### Singapore (ap-southeast-1)
+[![](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-1#/stacks/new?stackName=somok-cluster&templateURL=https://s3-ap-southeast-1.amazonaws.com/somok/aws-cluster.json)
+
+
 ### Ohio (us-east-2)
 [![](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?stackName=somok-cluster&templateURL=https://s3.us-east-2.amazonaws.com/nacho-dev/somok-aws-template.json)
 
-**Note:** Cloudformation Template works for: `us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-central-1`
+**Note:** Cloudformation Template works for: `us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-central-1, ap-southeast-1`
 
 
 ## Setup instructions
