@@ -40,7 +40,6 @@
       "ap-southeast-1": { 
         "ubuntu": "ami-cd16aaae"
       }
-
     }
   },
   "Resources": {
