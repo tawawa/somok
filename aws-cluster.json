@@ -37,7 +37,7 @@
       "eu-central-1": {
         "ubuntu": "ami-9c09f0f3"
       },
-      "ap-southeast-1": { // singapore
+      "ap-southeast-1": { 
         "ubuntu": "ami-cd16aaae"
       }
 
